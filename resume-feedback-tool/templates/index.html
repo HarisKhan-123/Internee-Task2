@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Get instant, honest feedback on your resume</h1>
+  <p>Upload a PDF or DOCX. Our AI reviews structure, skills, and content — then tells you exactly what to fix.</p>
+</section>
+
+<section class="upload-card">
+  <form action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data" id="upload-form">
+    <label for="resume" class="dropzone" id="dropzone">
+      <input type="file" name="resume" id="resume" accept=".pdf,.docx" required>
+      <div class="dropzone-content">
+        <span class="dropzone-icon">⬆️</span>
+        <span class="dropzone-text" id="dropzone-text">Click to choose a file, or drag one here</span>
+        <span class="dropzone-hint">PDF or DOCX · Max 8 MB</span>
+      </div>
+    </label>
+    <button type="submit" class="btn-primary" id="submit-btn">Analyze My Resume</button>
+    <div class="loading" id="loading" style="display:none;">
+      <div class="spinner"></div>
+      <span>Analyzing your resume… this can take 10-20 seconds.</span>
+    </div>
+  </form>
+</section>
+
+<section class="how-it-works">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">1</span>
+      <p>Upload your resume as a PDF or DOCX file.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <p>We extract the text and send it to an LLM (via Groq's free API) for review.</p>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <p>You get a scored breakdown of structure, skills, and content — plus concrete fixes.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const input = document.getElementById('resume');
+  const text = document.getElementById('dropzone-text');
+  const dropzone = document.getElementById('dropzone');
+  const form = document.getElementById('upload-form');
+  const loading = document.getElementById('loading');
+  const submitBtn = document.getElementById('submit-btn');
+
+  input.addEventListener('change', () => {
+    if (input.files.length) {
+      text.textContent = input.files[0].name;
+    }
+  });
+
+  ['dragover', 'dragleave', 'drop'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => e.preventDefault());
+  });
+  dropzone.addEventListener('dragover', () => dropzone.classList.add('drag-active'));
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-active'));
+  dropzone.addEventListener('drop', (e) => {
+    dropzone.classList.remove('drag-active');
+    if (e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      text.textContent = e.dataTransfer.files[0].name;
+    }
+  });
+
+  form.addEventListener('submit', () => {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Analyzing…';
+    loading.style.display = 'flex';
+  });
+</script>
+{% endblock %}

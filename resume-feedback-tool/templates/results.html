@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="results">
+  <a href="{{ url_for('index') }}" class="back-link">&larr; Analyze another resume</a>
+
+  <div class="results-header">
+    <div>
+      <h1>Feedback for {{ filename }}</h1>
+      <p class="summary">{{ feedback.summary }}</p>
+    </div>
+    <div class="score-badge score-{{ 'good' if feedback.overall_score >= 75 else ('mid' if feedback.overall_score >= 50 else 'low') }}">
+      <span class="score-num">{{ feedback.overall_score }}</span>
+      <span class="score-label">/ 100</span>
+    </div>
+  </div>
+
+  <div class="score-grid">
+    <div class="score-card">
+      <h3>Structure</h3>
+      <div class="mini-score">{{ feedback.structure_feedback.score }}/100</div>
+      <ul>
+        {% for c in feedback.structure_feedback.comments %}<li>{{ c }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="score-card">
+      <h3>Skills</h3>
+      <div class="mini-score">{{ feedback.skills_feedback.score }}/100</div>
+      <ul>
+        {% for c in feedback.skills_feedback.comments %}<li>{{ c }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="score-card">
+      <h3>Content</h3>
+      <div class="mini-score">{{ feedback.content_feedback.score }}/100</div>
+      <ul>
+        {% for c in feedback.content_feedback.comments %}<li>{{ c }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <h2>✅ Strengths</h2>
+      <ul class="strength-list">
+        {% for s in feedback.strengths %}<li>{{ s }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>🛠️ Improvement Areas</h2>
+      <ul class="improve-list">
+        {% for item in feedback.improvement_areas %}
+          <li><strong>{{ item.issue }}:</strong> {{ item.suggestion }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  {% if feedback.missing_sections %}
+  <div class="panel">
+    <h2>📋 Missing / Weak Sections</h2>
+    <ul>{% for m in feedback.missing_sections %}<li>{{ m }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if feedback.ats_notes %}
+  <div class="panel">
+    <h2>🤖 ATS Notes</h2>
+    <ul>{% for a in feedback.ats_notes %}<li>{{ a }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <details class="preview-box">
+    <summary>Show extracted text preview</summary>
+    <pre>{{ resume_preview }}…</pre>
+  </details>
+</section>
+{% endblock %}
